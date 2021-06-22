@@ -11,5 +11,5 @@ public interface Constant {
     int DESC_DAY = 1008;
     int ASC_MONEY = 1009;
     int DESC_MONEY = 1010;
-    long SLEEP_TIME = 10;
+    long SLEEP_TIME = 50;
 }
