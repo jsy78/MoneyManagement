@@ -34,8 +34,6 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-
-
     <TableRow
         android:id="@+id/tableRow"
         android:layout_width="wrap_content"

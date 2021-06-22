@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayoutMediator;
+
 import com.knu.moneymanagement.database.Constant;
 import com.knu.moneymanagement.database.StaticVariable;
 import com.knu.moneymanagement.list.List_AllFragment;

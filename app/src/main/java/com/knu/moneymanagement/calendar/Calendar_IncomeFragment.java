@@ -152,8 +152,8 @@ public class Calendar_IncomeFragment extends Fragment implements Constant {
 
         sqlSelect =
                 "SELECT " + "SUM(" + MoneyDBCtrct.COL_MONEY + ")" + " FROM " + MoneyDBCtrct.TBL_MONEY + " " +
-                        "WHERE " + MoneyDBCtrct.COL_CATEGORY + "=" + "'수입'" + " AND " + MoneyDBCtrct.COL_YEAR + "=" + year + " AND " + MoneyDBCtrct.COL_MONTH + "=" + month + " AND " + MoneyDBCtrct.COL_DAY + "=" + day + " " +
-                        "GROUP BY " + MoneyDBCtrct.COL_YEAR + ", " + MoneyDBCtrct.COL_MONTH + ", " + MoneyDBCtrct.COL_DAY;
+                "WHERE " + MoneyDBCtrct.COL_CATEGORY + "=" + "'수입'" + " AND " + MoneyDBCtrct.COL_YEAR + "=" + year + " AND " + MoneyDBCtrct.COL_MONTH + "=" + month + " AND " + MoneyDBCtrct.COL_DAY + "=" + day + " " +
+                "GROUP BY " + MoneyDBCtrct.COL_YEAR + ", " + MoneyDBCtrct.COL_MONTH + ", " + MoneyDBCtrct.COL_DAY;
         cursor = db.rawQuery(sqlSelect, null);
         long income = 0L;
         while (cursor.moveToNext())
