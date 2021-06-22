@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">스마트 용돈관리</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">스마트 용돈관리</string>
+    <string name="nav_header_subtitle_1">경북대학교</string>
+    <string name="nav_header_subtitle_2">컴퓨터학부</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">설정</string>
+    <string name="action_game">룰렛 게임</string>
+    <string name="action_home">메인화면</string>
+    <string name="action_hint">비밀번호 힌트</string>
+    <string name="action_exit">종료</string>
+
+    <string name="menu_calender">간략히 보기</string>
+    <string name="menu_list">자세히 보기</string>
+    <string name="menu_graph">그래프 보기</string>
+    <string name="menu_setting">설정</string>
+    <string name="menu_password">비밀번호 입력</string>
+    <string name="menu_game">룰렛 게임</string>
+    <string name="menu_add">추가하기</string>
+    <string name="menu_modify">수정/삭제</string>
+    <string name="menu_batch_delete">일괄 삭제</string>
+    <string name="menu_exit">종료</string>
+
+    <string name="contents">%s</string>
+
+    <string-array name="order">
+        <item>날짜 오름차순</item>
+        <item>날짜 내림차순</item>
+        <item>금액 오름차순"</item>
+        <item>금액 내림차순"</item>
+    </string-array>
+
+</resources>

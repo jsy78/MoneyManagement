@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item android:title="보기">
+            <menu>
+                <item
+                    android:id="@+id/nav_calendar"
+                    android:icon="@drawable/ic_menu_calendar"
+                    android:title="@string/menu_calender" />
+                <item
+                    android:id="@+id/nav_list"
+                    android:icon="@drawable/ic_menu_list"
+                    android:title="@string/menu_list" />
+                <item
+                    android:id="@+id/nav_graph"
+                    android:icon="@drawable/ic_menu_graph"
+                    android:title="@string/menu_graph" />
+            </menu>
+        </item>
+    </group>
+
+    <group android:checkableBehavior="single">
+        <item android:title="기타">
+            <menu>
+                <item
+                    android:id="@+id/nav_game"
+                    android:icon="@drawable/ic_menu_roulette"
+                    android:title="@string/menu_game" />
+                <item
+                    android:id="@+id/nav_setting"
+                    android:icon="@drawable/ic_menu_setting"
+                    android:title="@string/menu_setting" />
+                <item
+                    android:id="@+id/nav_exit"
+                    android:icon="@drawable/ic_menu_exit"
+                    android:title="@string/menu_exit" />
+            </menu>
+        </item>
+    </group>
+
+</menu>
