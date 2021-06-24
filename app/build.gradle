@@ -5,7 +5,7 @@ android {
     buildToolsVersion "29.0.2"
     defaultConfig {
         applicationId "com.knu.moneymanagement"
-        minSdkVersion 27
+        minSdkVersion 23
         //noinspection OldTargetApi
         targetSdkVersion 29
         versionCode 6
