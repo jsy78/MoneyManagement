@@ -116,7 +116,7 @@ public class AddActivity extends AppCompatActivity implements Constant {
                 int year = datePicker.getYear();
                 int month = datePicker.getMonth() + 1;
                 int day = datePicker.getDayOfMonth();
-                String detail = detailText.getText().toString();
+                String detail = detailText.getText().toString().replace("'","''");
                 int money = Integer.parseInt(moneyText.getText().toString());
 
                 String sqlInsert = MoneyDBCtrct.SQL_INSERT + "(" + "'" + category + "', " +  year + ", " + month + ", " + day + ", " + "'" + detail + "', " + money + ")";
