@@ -1,5 +1,6 @@
 package com.knu.moneymanagement.calendar;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,11 +11,13 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.knu.moneymanagement.ItemDiffUtil;
 import com.knu.moneymanagement.ModifyActivity;
 import com.knu.moneymanagement.RecyclerViewAdapter;
 import com.knu.moneymanagement.RecyclerViewItem;
@@ -47,9 +51,21 @@ public class Calendar_IncomeFragment extends Fragment implements Constant {
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        Log.d("MyTag", "Calendar_IncomeFragment onAttach");
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.d("MyTag", "Calendar_IncomeFragment onCreate");
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        Log.d("MyTag", "Calendar_IncomeFragment onCreateView");
         if(getActivity() != null) {
             View root = inflater.inflate(R.layout.fragment_calendar_income, container, false);
 
@@ -65,7 +81,7 @@ public class Calendar_IncomeFragment extends Fragment implements Constant {
             allIncomeText = root.findViewById(R.id.allIncomeText);
             mRecyclerView = root.findViewById(R.id.dayIncomeRecyclerView);
 
-            mAdapter = new RecyclerViewAdapter(mItemList);
+            mAdapter = new RecyclerViewAdapter(new ItemDiffUtil());
             mRecyclerView.setAdapter(mAdapter);
             mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
@@ -134,13 +150,51 @@ public class Calendar_IncomeFragment extends Fragment implements Constant {
     }
 
     @Override
+    public void onStart() {
+        Log.d("MyTag", "Calendar_IncomeFragment onStart");
+        super.onStart();
+    }
+
+    @Override
     public void onResume() {
+        Log.d("MyTag", "Calendar_IncomeFragment onResume");
         super.onResume();
         linearLayout.setVisibility(View.VISIBLE);
         createIncomeInfo(StaticVariable.year, StaticVariable.month, StaticVariable.day);
     }
 
-    private void createIncomeInfo(int year, int month, int day) {
+    @Override
+    public void onPause() {
+        Log.d("MyTag", "Calendar_IncomeFragment onPause");
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        Log.d("MyTag", "Calendar_IncomeFragment onStop");
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        Log.d("MyTag", "Calendar_IncomeFragment onDestroyView");
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d("MyTag", "Calendar_IncomeFragment onDestroy");
+        super.onDestroy();
+    }
+
+    @Override
+    public void onDetach() {
+        Log.d("MyTag", "Calendar_IncomeFragment onDetach");
+        super.onDetach();
+    }
+
+    public void createIncomeInfo(int year, int month, int day) {
+        Log.d("MyTag", "Calendar_IncomeFragment createIncomeInfo");
         MoneyDBHelper dbHelper = new MoneyDBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String sqlSelect;
@@ -193,7 +247,8 @@ public class Calendar_IncomeFragment extends Fragment implements Constant {
 
             mItemList.add(item);
         }
-        mAdapter.notifyDataSetChanged();
+        //mAdapter.notifyDataSetChanged();
+        mAdapter.submitList(mItemList);
 
         incomeCountText.setText(getString(R.string.contents, "총 " + mAdapter.getItemCount() + "건"));
 

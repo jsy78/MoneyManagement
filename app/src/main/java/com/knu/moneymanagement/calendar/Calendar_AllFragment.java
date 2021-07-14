@@ -1,5 +1,6 @@
 package com.knu.moneymanagement.calendar;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -11,11 +12,13 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.knu.moneymanagement.ItemDiffUtil;
 import com.knu.moneymanagement.ModifyActivity;
 import com.knu.moneymanagement.RecyclerViewAdapter;
 import com.knu.moneymanagement.RecyclerViewItem;
@@ -48,8 +52,21 @@ public class Calendar_AllFragment extends Fragment implements Constant {
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        Log.d("MyTag", "Calendar_AllFragment onAttach");
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.d("MyTag", "Calendar_AllFragment onCreate");
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d("MyTag", "Calendar_AllFragment onCreateView");
         if(getActivity() != null) {
             View root = inflater.inflate(R.layout.fragment_calendar_all, container, false);
 
@@ -65,7 +82,7 @@ public class Calendar_AllFragment extends Fragment implements Constant {
             allCashText = root.findViewById(R.id.allCashText);
             mRecyclerView = root.findViewById(R.id.dayAllRecyclerView);
 
-            mAdapter = new RecyclerViewAdapter(mItemList);
+            mAdapter = new RecyclerViewAdapter(new ItemDiffUtil());
             mRecyclerView.setAdapter(mAdapter);
             mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
@@ -133,13 +150,51 @@ public class Calendar_AllFragment extends Fragment implements Constant {
     }
 
     @Override
+    public void onStart() {
+        Log.d("MyTag", "Calendar_AllFragment onStart");
+        super.onStart();
+    }
+
+    @Override
     public void onResume() {
+        Log.d("MyTag", "Calendar_AllFragment onResume");
         super.onResume();
         linearLayout.setVisibility(View.VISIBLE);
         createAllInfo(StaticVariable.year, StaticVariable.month, StaticVariable.day);
     }
 
-    private void createAllInfo(int year, int month, int day) {
+    @Override
+    public void onPause() {
+        Log.d("MyTag", "Calendar_AllFragment onPause");
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        Log.d("MyTag", "Calendar_AllFragment onStop");
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        Log.d("MyTag", "Calendar_AllFragment onDestroyView");
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d("MyTag", "Calendar_AllFragment onDestroy");
+        super.onDestroy();
+    }
+
+    @Override
+    public void onDetach() {
+        Log.d("MyTag", "Calendar_AllFragment onDetach");
+        super.onDetach();
+    }
+
+    public void createAllInfo(int year, int month, int day) {
+        Log.d("MyTag", "Calendar_AllFragment createAllInfo");
         MoneyDBHelper dbHelper = new MoneyDBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String sqlSelect;
@@ -208,7 +263,8 @@ public class Calendar_AllFragment extends Fragment implements Constant {
 
             mItemList.add(item);
         }
-        mAdapter.notifyDataSetChanged();
+        //mAdapter.notifyDataSetChanged();
+        mAdapter.submitList(mItemList);
 
         allCountText.setText(getString(R.string.contents, "총 " + mAdapter.getItemCount() + "건"));
 

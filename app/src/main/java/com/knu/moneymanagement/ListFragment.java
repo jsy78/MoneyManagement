@@ -12,10 +12,12 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import com.google.android.material.tabs.TabLayout;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +35,7 @@ import com.knu.moneymanagement.list.List_ExpenFragment;
 import com.knu.moneymanagement.list.List_IncomeFragment;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 public class ListFragment extends Fragment implements Constant {
 
@@ -48,7 +51,7 @@ public class ListFragment extends Fragment implements Constant {
     public Toolbar mToolbar;
     public Button delete, cancel;
 
-    private static class PageChangeTask extends AsyncTask<Integer, Void, Void> {
+    /*private static class PageChangeTask extends AsyncTask<Integer, Void, Void> {
 
         private final WeakReference<ListFragment> FragmentReference;
 
@@ -97,7 +100,7 @@ public class ListFragment extends Fragment implements Constant {
             super.onPostExecute(result);
         }
 
-    }
+    }*/
 
     private static class RefreshTask extends AsyncTask<Void, Void, Void> {
 
@@ -154,6 +157,7 @@ public class ListFragment extends Fragment implements Constant {
 
     @Override
     public void onAttach(@NonNull Context context) {
+        Log.d("MyTag", "ListFragment onAttach");
         super.onAttach(context);
 
         if (context instanceof Activity) {
@@ -164,8 +168,15 @@ public class ListFragment extends Fragment implements Constant {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.d("MyTag", "ListFragment onCreate");
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d("MyTag", "ListFragment onCreateView");
         View root = inflater.inflate(R.layout.fragment_list, container, false);
 
         mLoadingDialog = new LoadingDialog(activity, R.style.Loading_Dialog_Theme);
@@ -184,17 +195,19 @@ public class ListFragment extends Fragment implements Constant {
         cancel = root.findViewById(R.id.btn_list_cancel);
 
         mViewPager2 = root.findViewById(R.id.viewPager2);
+        mViewPager2.setOffscreenPageLimit(2);
 
-        mFragmentAdapter = new ViewPagerFragmentAdapter(getChildFragmentManager(), getLifecycle());
+        mFragmentAdapter = new ViewPagerFragmentAdapter(getChildFragmentManager(), getLifecycle(), new FragmentDiffUtil());
 
         mViewPager2.setAdapter(mFragmentAdapter);
-        mViewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+        /*mViewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
-             // super.onPageSelected(position);
-                new PageChangeTask(ListFragment.this).execute();
+                super.onPageSelected(position);
+                mViewPager2.setCurrentItem(position);
+                //new PageChangeTask(ListFragment.this).execute();
             }
-        });
+        });*/
         new TabLayoutMediator(mTabLayout, mViewPager2, (tab, position) -> {
             switch (position) {
                 case 0 :
@@ -375,11 +388,14 @@ public class ListFragment extends Fragment implements Constant {
     }
 
     private void fragmentRefresh() {
-        mFragmentAdapter.clearFragment();
-        mFragmentAdapter.addFragment(new List_AllFragment());
-        mFragmentAdapter.addFragment(new List_IncomeFragment());
-        mFragmentAdapter.addFragment(new List_ExpenFragment());
-        mFragmentAdapter.notifyDataSetChanged();
+        Log.d("MyTag", "ListFragment fragmentRefresh");
+        mFragmentAdapter.submitList(new ArrayList<Fragment>() {
+            {
+                add(new List_AllFragment());
+                add(new List_IncomeFragment());
+                add(new List_ExpenFragment());
+            }
+        });
     }
 
     public void singleSelectionMode() {
@@ -405,7 +421,14 @@ public class ListFragment extends Fragment implements Constant {
     }
 
     @Override
+    public void onStart() {
+        Log.d("MyTag", "ListFragment onStart");
+        super.onStart();
+    }
+
+    @Override
     public void onResume() {
+        Log.d("MyTag", "ListFragment onResume");
         super.onResume();
         singleSelectionMode();
         mViewPager2.setUserInputEnabled(true);
@@ -415,5 +438,35 @@ public class ListFragment extends Fragment implements Constant {
         else
             monthText.setText(getString(R.string.contents,""+StaticVariable.month));
         new RefreshTask(ListFragment.this).execute();
+    }
+
+    @Override
+    public void onPause() {
+        Log.d("MyTag", "ListFragment onPause");
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        Log.d("MyTag", "ListFragment onStop");
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        Log.d("MyTag", "ListFragment onDestroyView");
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d("MyTag", "ListFragment onDestroy");
+        super.onDestroy();
+    }
+
+    @Override
+    public void onDetach() {
+        Log.d("MyTag", "ListFragment onDetach");
+        super.onDetach();
     }
 }

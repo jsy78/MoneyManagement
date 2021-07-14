@@ -1,6 +1,7 @@
 package com.knu.moneymanagement.list;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -12,18 +13,21 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.knu.moneymanagement.ItemDiffUtil;
 import com.knu.moneymanagement.ListFragment;
 import com.knu.moneymanagement.RecyclerViewAdapter;
 import com.knu.moneymanagement.RecyclerViewItem;
@@ -40,17 +44,30 @@ public class List_AllFragment extends Fragment implements Constant {
 
     private ConstraintLayout constraintLayout;
     private boolean isSingleSelectionMode = true;
+    private int selectedCount = 0;
     private TextView notExistText;
     private RecyclerView mRecyclerView = null;
     private RecyclerViewAdapter mAdapter = null;
-    private final ArrayList<RecyclerViewItem> mItemList = new ArrayList<>();
 
     public List_AllFragment() {
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        Log.d("MyTag", "List_AllFragment onAttach");
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.d("MyTag", "List_AllFragment onCreate");
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d("MyTag", "List_AllFragment onCreateView");
         // Inflate the layout for this fragment
         if(getActivity() != null) {
             View root = inflater.inflate(R.layout.fragment_list_all, container, false);
@@ -58,7 +75,7 @@ public class List_AllFragment extends Fragment implements Constant {
             constraintLayout = root.findViewById(R.id.listAllView);
             notExistText = root.findViewById(R.id.allRecyclerNotExist);
             mRecyclerView = root.findViewById(R.id.allRecyclerView);
-            mAdapter = new RecyclerViewAdapter(mItemList);
+            mAdapter = new RecyclerViewAdapter(new ItemDiffUtil());
             mRecyclerView.setAdapter(mAdapter);
             mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
@@ -99,13 +116,13 @@ public class List_AllFragment extends Fragment implements Constant {
                     Intent it = new Intent(getActivity(), ModifyActivity.class);
                     Bundle bundle = new Bundle();
 
-                    int i = mItemList.get(position).getId();
-                    String category = mItemList.get(position).getCategory();
-                    int year = mItemList.get(position).getYear();
-                    int month = mItemList.get(position).getMonth();
-                    int day = mItemList.get(position).getDay();
-                    String detail = mItemList.get(position).getDetail();
-                    int money = mItemList.get(position).getMoney();
+                    int i = mAdapter.getCurrentList().get(position).getId();
+                    String category = mAdapter.getCurrentList().get(position).getCategory();
+                    int year = mAdapter.getCurrentList().get(position).getYear();
+                    int month = mAdapter.getCurrentList().get(position).getMonth();
+                    int day = mAdapter.getCurrentList().get(position).getDay();
+                    String detail = mAdapter.getCurrentList().get(position).getDetail();
+                    int money = mAdapter.getCurrentList().get(position).getMoney();
 
                     bundle.putInt("id", i);
                     bundle.putString("category", category);
@@ -120,10 +137,21 @@ public class List_AllFragment extends Fragment implements Constant {
                     modifyActivityResult.launch(it);
                 }
                 else {
-                    mItemList.get(position).setCheck(!mItemList.get(position).isChecked());
-                    mAdapter.notifyItemChanged(position);
+                    ArrayList<RecyclerViewItem> newList = new ArrayList<RecyclerViewItem>() {
+                        {
+                            for (RecyclerViewItem item : mAdapter.getCurrentList())
+                                add(item.clone());
+                        }
+                    };
+                    newList.get(position).setCheck(!newList.get(position).isChecked());
+                    if(newList.get(position).isChecked())
+                        selectedCount += 1;
+                    else
+                        selectedCount -= 1;
+                    //mAdapter.notifyItemChanged(position);
+                    mAdapter.submitList(newList);
                     if(getParentFragment() != null)
-                        ((ListFragment)getParentFragment()).mToolbar.setTitle("선택된 항목 (" + mAdapter.getSelectedItemCount() + " / " + mAdapter.getItemCount() + ")");
+                        ((ListFragment)getParentFragment()).mToolbar.setTitle("선택된 항목 (" + selectedCount + " / " + mAdapter.getItemCount() + ")");
                 }
             });
 
@@ -145,17 +173,23 @@ public class List_AllFragment extends Fragment implements Constant {
     }
 
     @Override
+    public void onStart() {
+        Log.d("MyTag", "List_AllFragment onStart");
+        super.onStart();
+    }
+
+    @Override
     public void onResume() {
+        Log.d("MyTag", "List_AllFragment onResume");
         super.onResume();
         constraintLayout.setVisibility(View.VISIBLE);
-
         createAllList(StaticVariable.year, StaticVariable.month, StaticVariable.sort);
 
         if(getParentFragment() != null) {
-            ((ListFragment)getParentFragment()).mToolbar.setTitle("선택된 항목 (" + 0 + " / " + mAdapter.getItemCount() + ")");
+            ((ListFragment)getParentFragment()).mToolbar.setTitle("선택된 항목 (" + selectedCount + " / " + mAdapter.getItemCount() + ")");
 
             ((ListFragment)getParentFragment()).delete.setOnClickListener(v -> {
-                if (mAdapter.getSelectedItemCount() <= 0) {
+                if (selectedCount <= 0) {
                     Toast.makeText(getActivity(), "한 개 이상의 항목을 선택해주세요.", Toast.LENGTH_SHORT).show();
                 }
                 else {
@@ -190,18 +224,59 @@ public class List_AllFragment extends Fragment implements Constant {
 
             ((ListFragment) getParentFragment()).cancel.setOnClickListener(v -> {
                 if(getParentFragment() != null) {
-                    Toast.makeText(getActivity(), "선택 모드 해제", Toast.LENGTH_SHORT).show();
                     isSingleSelectionMode = true;
-                    mAdapter.clearSelectedItem();
-                    ((ListFragment)getParentFragment()).mToolbar.setTitle("선택된 항목 (" + 0 + " / " + mAdapter.getItemCount() + ")");
-                    ((ListFragment)getParentFragment()).mViewPager2.setUserInputEnabled(true);
-                    ((ListFragment)getParentFragment()).singleSelectionMode();
+                    selectedCount = 0;
+                    ((ListFragment) getParentFragment()).mToolbar.setTitle("선택된 항목 (" + selectedCount + " / " + mAdapter.getItemCount() + ")");
+                    ((ListFragment) getParentFragment()).mViewPager2.setUserInputEnabled(true);
+                    ((ListFragment) getParentFragment()).singleSelectionMode();
+                    ArrayList<RecyclerViewItem> newList = new ArrayList<RecyclerViewItem>() {
+                        {
+                            for (RecyclerViewItem item : mAdapter.getCurrentList())
+                                add(item.clone());
+                        }
+                    };
+                    for (RecyclerViewItem item : newList)
+                        if (item.isChecked())
+                            item.setCheck(false);
+                    mAdapter.submitList(newList);
+                    Toast.makeText(getActivity(), "선택 모드 해제", Toast.LENGTH_SHORT).show();
                 }
             });
         }
     }
 
-    private void createAllList(int yearValue, int monthValue, int sort) {
+    @Override
+    public void onPause() {
+        Log.d("MyTag", "List_AllFragment onPause");
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        Log.d("MyTag", "List_AllFragment onStop");
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        Log.d("MyTag", "List_AllFragment onDestroyView");
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d("MyTag", "List_AllFragment onDestroy");
+        super.onDestroy();
+    }
+
+    @Override
+    public void onDetach() {
+        Log.d("MyTag", "List_AllFragment onDetach");
+        super.onDetach();
+    }
+
+    public void createAllList(int yearValue, int monthValue, int sort) {
+        Log.d("MyTag", "List_AllFragment createAllList");
         MoneyDBHelper dbHelper = new MoneyDBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String sqlSelect;
@@ -210,7 +285,7 @@ public class List_AllFragment extends Fragment implements Constant {
         Bitmap incomeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_income);
         Bitmap expenIcon  = BitmapFactory.decodeResource(getResources(), R.drawable.ic_expen);
 
-        mItemList.clear();
+        ArrayList<RecyclerViewItem> mItemList = new ArrayList<>();
         switch (sort) {
             case DESC_DAY:
                 sqlSelect = MoneyDBCtrct.SQL_SELECT + " WHERE " + MoneyDBCtrct.COL_YEAR + "=" + yearValue + " AND " + MoneyDBCtrct.COL_MONTH + "=" + monthValue + " ORDER BY " + MoneyDBCtrct.COL_DAY + " DESC";
@@ -255,7 +330,8 @@ public class List_AllFragment extends Fragment implements Constant {
 
             mItemList.add(item);
         }
-        mAdapter.notifyDataSetChanged();
+        //mAdapter.notifyItemInserted(mItemList.size()-1);
+        mAdapter.submitList(mItemList);
 
         cursor.close();
         db.close();

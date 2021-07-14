@@ -2,7 +2,11 @@ package com.knu.moneymanagement;
 
 import android.content.Context;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +14,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import java.util.ArrayList;
+import java.util.List;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.MyViewHolder> {
+public class RecyclerViewAdapter extends ListAdapter<RecyclerViewItem, RecyclerViewAdapter.MyViewHolder> {
 
-    private final ArrayList<RecyclerViewItem> recyclerItem;
+    //private final ArrayList<RecyclerViewItem> recyclerItem = new ArrayList<>();
 
     public interface OnItemClickListener {
         void onItemClick(View view, int position);
@@ -93,8 +98,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     // 생성자에서 데이터 리스트 객체를 전달받음.
-    public RecyclerViewAdapter(ArrayList<RecyclerViewItem> list) {
+    /*public RecyclerViewAdapter(ArrayList<RecyclerViewItem> list) {
         this.recyclerItem = list;
+    }*/
+    public RecyclerViewAdapter(@NonNull DiffUtil.ItemCallback<RecyclerViewItem> diffCallback) {
+        super(diffCallback);
+    }
+
+    @Override
+    public void submitList(@Nullable List<RecyclerViewItem> list) {
+        //super.submitList(list != null ? new ArrayList<>(list) : null);
+        super.submitList(list);
     }
 
     // onCreateViewHolder() - 아이템 뷰를 위한 뷰홀더 객체 생성하여 리턴.
@@ -112,7 +126,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     // onBindViewHolder() - position에 해당하는 데이터를 뷰홀더의 아이템뷰에 표시.
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder viewHolder, int position) {
-        RecyclerViewItem item = recyclerItem.get(position);
+        RecyclerViewItem item = getItem(position);
 
         if(item.isChecked())
             viewHolder.linearLayout.setBackgroundColor(0xFFC0C0C0);
@@ -128,40 +142,82 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     // getItemCount() - 전체 데이터 갯수 리턴.
     @Override
     public int getItemCount() {
-        return recyclerItem.size();
+        return getCurrentList().size();
     }
 
     public ArrayList<RecyclerViewItem> getSelectedItem() {
         ArrayList<RecyclerViewItem> selected = new ArrayList<>();
 
-        for (int i = 0; i < recyclerItem.size(); i++) {
-            if (recyclerItem.get(i).isChecked()) {
-                selected.add(recyclerItem.get(i));
+        for (int i = 0; i < getCurrentList().size(); i++) {
+            if (getCurrentList().get(i).isChecked()) {
+                selected.add(getCurrentList().get(i));
             }
         }
         return selected;
     }
 
-    public int getSelectedItemCount() {
+    /*public int getSelectedItemCount() {
         int count = 0;
 
-        for (int i = 0; i < recyclerItem.size(); i++) {
-            if (recyclerItem.get(i).isChecked()) {
+        for (int i = 0; i < getCurrentList().size(); i++) {
+            if (getCurrentList().get(i).isChecked()) {
                 count += 1;
             }
         }
         return count;
-    }
+    }*/
 
-    public void clearSelectedItem() {
-        for (int i = 0; i < recyclerItem.size(); i++) {
-            if (recyclerItem.get(i).isChecked()) {
-                recyclerItem.get(i).setCheck(false);
+    //public void clearSelectedItem() {
+        /*int positionStart = -1;
+
+        for (int i = 0; i < getCurrentList().size(); i++) {
+            if (getCurrentList().get(i).isChecked()) {
+                positionStart = i;
+                break;
             }
         }
-        notifyDataSetChanged();
-    }
 
+        if (positionStart >= 0) {
+            int count = 0;
+
+            for (int i = positionStart; i < getCurrentList().size(); i++) {
+                if (getCurrentList().get(i).isChecked()) {
+                    getCurrentList().get(i).setCheck(false);
+                    count += 1;
+                }
+            }
+            notifyItemRangeChanged(positionStart, count);
+        }*/
+
+        /*for (int i = 0; i < getCurrentList().size(); i++) {
+            if (getCurrentList().get(i).isChecked()) {
+                getCurrentList().get(i).setCheck(false);
+                notifyItemChanged(i);
+            }
+        }*/
+
+        /*ArrayList<RecyclerViewItem> newList = new ArrayList<>();
+        for (RecyclerViewItem item : getCurrentList()) {
+            newList.add(item.clone());
+        }
+
+        for (int i = 0; i < newList.size(); i++) {
+            if (newList.get(i).isChecked()) {
+                newList.get(i).setCheck(false);
+            }
+        }
+        submitList(newList);*/
+    //}
+
+    /*public void updateList(ArrayList<RecyclerViewItem> newList) {
+        ItemDiffCallback callback = new ItemDiffCallback(this.recyclerItem, newList);
+        final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(callback, false);
+
+        this.recyclerItem.clear();
+        this.recyclerItem.addAll(newList);
+        //new Handler(Looper.getMainLooper()).post(() -> diffResult.dispatchUpdatesTo(RecyclerViewAdapter.this));
+        diffResult.dispatchUpdatesTo(this);
+    }*/
 }
 
 

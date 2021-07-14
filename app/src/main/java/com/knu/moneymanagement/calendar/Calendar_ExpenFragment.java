@@ -1,5 +1,6 @@
 package com.knu.moneymanagement.calendar;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,11 +11,13 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.knu.moneymanagement.ItemDiffUtil;
 import com.knu.moneymanagement.ModifyActivity;
 import com.knu.moneymanagement.RecyclerViewAdapter;
 import com.knu.moneymanagement.RecyclerViewItem;
@@ -47,9 +51,21 @@ public class Calendar_ExpenFragment extends Fragment implements Constant {
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        Log.d("MyTag", "Calendar_ExpenFragment onAttach");
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.d("MyTag", "Calendar_ExpenFragment onCreate");
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        Log.d("MyTag", "Calendar_ExpenFragment onCreateView");
         if(getActivity() != null) {
             View root = inflater.inflate(R.layout.fragment_calendar_expen, container, false);
 
@@ -65,7 +81,7 @@ public class Calendar_ExpenFragment extends Fragment implements Constant {
             allExpenText = root.findViewById(R.id.allExpenText);
             mRecyclerView = root.findViewById(R.id.dayExpenRecyclerView);
 
-            mAdapter = new RecyclerViewAdapter(mItemList);
+            mAdapter = new RecyclerViewAdapter(new ItemDiffUtil());
             mRecyclerView.setAdapter(mAdapter);
             mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
@@ -133,13 +149,51 @@ public class Calendar_ExpenFragment extends Fragment implements Constant {
     }
 
     @Override
+    public void onStart() {
+        Log.d("MyTag", "Calendar_ExpenFragment onStart");
+        super.onStart();
+    }
+
+    @Override
     public void onResume() {
+        Log.d("MyTag", "Calendar_ExpenFragment onResume");
         super.onResume();
         linearLayout.setVisibility(View.VISIBLE);
         createExpenInfo(StaticVariable.year, StaticVariable.month, StaticVariable.day);
     }
 
-    private void createExpenInfo(int year, int month, int day) {
+    @Override
+    public void onPause() {
+        Log.d("MyTag", "Calendar_ExpenFragment onPause");
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        Log.d("MyTag", "Calendar_ExpenFragment onStop");
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        Log.d("MyTag", "Calendar_ExpenFragment onDestroyView");
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d("MyTag", "Calendar_ExpenFragment onDestroy");
+        super.onDestroy();
+    }
+
+    @Override
+    public void onDetach() {
+        Log.d("MyTag", "Calendar_ExpenFragment onDetach");
+        super.onDetach();
+    }
+
+    public void createExpenInfo(int year, int month, int day) {
+        Log.d("MyTag", "Calendar_ExpenFragment createExpenInfo");
         MoneyDBHelper dbHelper = new MoneyDBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String sqlSelect;
@@ -192,7 +246,8 @@ public class Calendar_ExpenFragment extends Fragment implements Constant {
 
             mItemList.add(item);
         }
-        mAdapter.notifyDataSetChanged();
+        //mAdapter.notifyDataSetChanged();
+        mAdapter.submitList(mItemList);
 
         expenCountText.setText(getString(R.string.contents, "총 " + mAdapter.getItemCount() + "건"));
 

@@ -7,6 +7,8 @@ import android.os.Bundle;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+
+import android.util.Log;
 import android.view.MenuItem;
 import com.google.android.material.navigation.NavigationView;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -89,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements Constant {
 
         @Override
         protected void onPreExecute() {
+            Log.d("MyTag", "ModeChange onPreExecute");
             MainActivity activity = activityReference.get();
 
             if(activity == null || activity.isFinishing())
@@ -118,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements Constant {
 
         @Override
         protected void onPostExecute(Void result) {
-
+            Log.d("MyTag", "ModeChange onPostExecute");
             MainActivity activity = activityReference.get();
 
             if(activity == null || activity.isFinishing())
@@ -157,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements Constant {
 
         new InitTask(MainActivity.this).execute(new CalendarFragment());
 
-        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+        bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.btn_calendar:
                     if(bottomNavigationView.getSelectedItemId() != item.getItemId())

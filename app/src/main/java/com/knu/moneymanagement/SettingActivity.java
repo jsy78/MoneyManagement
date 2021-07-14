@@ -4,6 +4,7 @@ import com.google.android.material.tabs.TabLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.view.Menu;
@@ -17,9 +18,12 @@ import com.knu.moneymanagement.setting.Setting_PasswordFragment;
 import com.knu.moneymanagement.setting.Setting_ResetFragment;
 import com.knu.moneymanagement.setting.Setting_RestoreFragment;
 
+import java.util.ArrayList;
+
 public class SettingActivity extends AppCompatActivity {
 
     private ViewPager2 mViewPager2;
+    private final ArrayList<Fragment> mFragmentItem = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,11 +38,12 @@ public class SettingActivity extends AppCompatActivity {
         mViewPager2 = findViewById(R.id.viewPager4);
         mViewPager2.setOffscreenPageLimit(3);
 
-        ViewPagerFragmentAdapter mFragmentAdapter = new ViewPagerFragmentAdapter(getSupportFragmentManager(), getLifecycle());
-        mFragmentAdapter.addFragment(new Setting_PasswordFragment());
-        mFragmentAdapter.addFragment(new Setting_BackupFragment());
-        mFragmentAdapter.addFragment(new Setting_RestoreFragment());
-        mFragmentAdapter.addFragment(new Setting_ResetFragment());
+        ViewPagerFragmentAdapter mFragmentAdapter = new ViewPagerFragmentAdapter(getSupportFragmentManager(), getLifecycle(), new FragmentDiffUtil());
+        mFragmentItem.add(new Setting_PasswordFragment());
+        mFragmentItem.add(new Setting_BackupFragment());
+        mFragmentItem.add(new Setting_RestoreFragment());
+        mFragmentItem.add(new Setting_ResetFragment());
+        mFragmentAdapter.submitList(mFragmentItem);
         mViewPager2.setAdapter(mFragmentAdapter);
 
         new TabLayoutMediator(mTabLayout, mViewPager2, (tab, position) -> {

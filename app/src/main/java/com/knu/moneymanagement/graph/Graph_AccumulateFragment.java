@@ -55,7 +55,7 @@ public class Graph_AccumulateFragment extends Fragment {
         createLine(StaticVariable.year);
     }
 
-    private void createLine(int year) {
+    public void createLine(int year) {
         MoneyDBHelper dbHelper = new MoneyDBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String sqlSelect;

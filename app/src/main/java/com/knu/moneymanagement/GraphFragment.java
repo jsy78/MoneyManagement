@@ -28,6 +28,7 @@ import com.knu.moneymanagement.graph.Graph_MonthFragment;
 import com.knu.moneymanagement.graph.Graph_YearFragment;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 public class GraphFragment extends Fragment implements Constant {
 
@@ -35,7 +36,7 @@ public class GraphFragment extends Fragment implements Constant {
     private ViewPagerFragmentAdapter mFragmentAdapter;
     private LoadingDialog mLoadingDialog;
 
-    private static class PageChangeTask extends AsyncTask<Integer, Void, Void> {
+    /*private static class PageChangeTask extends AsyncTask<Integer, Void, Void> {
 
         private final WeakReference<GraphFragment> FragmentReference;
 
@@ -84,7 +85,8 @@ public class GraphFragment extends Fragment implements Constant {
             super.onPostExecute(result);
         }
 
-    }
+    }*/
+
     private static class RefreshTask extends AsyncTask<Void, Void, Void> {
 
         private final WeakReference<GraphFragment> FragmentReference;
@@ -158,24 +160,26 @@ public class GraphFragment extends Fragment implements Constant {
 
         mLoadingDialog = new LoadingDialog(activity, R.style.Loading_Dialog_Theme);
 
-        TabLayout mTabLayout = root.findViewById(R.id.tabLayout3);
-
         yearText = root.findViewById(R.id.yearGraphText);
         Button prev = root.findViewById(R.id.btn_prev_graph_year);
         Button next = root.findViewById(R.id.btn_next_graph_year);
 
         ViewPager2 mViewPager2 = root.findViewById(R.id.viewPager3);
+        mViewPager2.setOffscreenPageLimit(4);
 
-        mFragmentAdapter = new ViewPagerFragmentAdapter(getChildFragmentManager(), getLifecycle());
+        mFragmentAdapter = new ViewPagerFragmentAdapter(getChildFragmentManager(), getLifecycle(), new FragmentDiffUtil());
 
         mViewPager2.setAdapter(mFragmentAdapter);
-        mViewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+        /*mViewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
-             // super.onPageSelected(position);
-                new PageChangeTask(GraphFragment.this).execute();
+                super.onPageSelected(position);
+                mViewPager2.setCurrentItem(position);
+                //new PageChangeTask(GraphFragment.this).execute();
             }
-        });
+        });*/
+
+        TabLayout mTabLayout = root.findViewById(R.id.tabLayout3);
         new TabLayoutMediator(mTabLayout, mViewPager2, (tab, position) -> {
             switch (position) {
                 case 0 :
@@ -244,13 +248,15 @@ public class GraphFragment extends Fragment implements Constant {
     }
 
     private void fragmentRefresh() {
-        mFragmentAdapter.clearFragment();
-        mFragmentAdapter.addFragment(new Graph_MonthFragment());
-        mFragmentAdapter.addFragment(new Graph_YearFragment());
-        mFragmentAdapter.addFragment(new Graph_AccumulateFragment());
-        mFragmentAdapter.addFragment(new Graph_BalanceFragment());
-        mFragmentAdapter.addFragment(new Graph_AcculBalanceFragment());
-        mFragmentAdapter.notifyDataSetChanged();
+        mFragmentAdapter.submitList(new ArrayList<Fragment>() {
+            {
+                add(new Graph_MonthFragment());
+                add(new Graph_YearFragment());
+                add(new Graph_AccumulateFragment());
+                add(new Graph_BalanceFragment());
+                add(new Graph_AcculBalanceFragment());
+            }
+        });
     }
 
     @Override

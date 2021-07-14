@@ -220,7 +220,7 @@ public class Graph_MonthFragment extends Fragment implements Constant {
         createChart(StaticVariable.year, StaticVariable.month);
     }
 
-    private void createChart(int year, int month){
+    public void createChart(int year, int month){
         MoneyDBHelper dbHelper = new MoneyDBHelper(getActivity());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String sqlSelect;

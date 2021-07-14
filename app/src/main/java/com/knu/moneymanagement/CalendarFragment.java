@@ -16,12 +16,13 @@ import androidx.annotation.NonNull;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.core.widget.NestedScrollView;
 import androidx.viewpager2.widget.ViewPager2;
-import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,8 +64,11 @@ public class CalendarFragment extends Fragment implements Constant {
     private LinearLayout addLinear;
     private LinearLayout resetLinear;
     private boolean fabExpanded = false;
+    private final ArrayList<CalendarDay> incomeDays = new ArrayList<>();
+    private final ArrayList<CalendarDay> expenDays = new ArrayList<>();
+    private final ArrayList<CalendarDay> inexpDays = new ArrayList<>();
 
-    private static class PageChangeTask extends AsyncTask<Integer, Void, Void> {
+    /*private static class PageChangeTask extends AsyncTask<Integer, Void, Void> {
 
         private final WeakReference<CalendarFragment> FragmentReference;
 
@@ -113,7 +117,7 @@ public class CalendarFragment extends Fragment implements Constant {
             super.onPostExecute(result);
         }
 
-    }
+    }*/
 
     private static class RefreshTask extends AsyncTask<Void, Void, Void> {
 
@@ -228,15 +232,12 @@ public class CalendarFragment extends Fragment implements Constant {
 
     }
 
-    private final ArrayList<CalendarDay> incomeDays = new ArrayList<>();
-    private final ArrayList<CalendarDay> expenDays = new ArrayList<>();
-    private final ArrayList<CalendarDay> inexpDays = new ArrayList<>();
-
     public CalendarFragment() {
     }
 
     @Override
     public void onAttach(@NonNull Context context) {
+        Log.d("MyTag", "CalendarFragment onAttach");
         super.onAttach(context);
 
         if (context instanceof Activity) {
@@ -246,14 +247,19 @@ public class CalendarFragment extends Fragment implements Constant {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.d("MyTag", "CalendarFragment onCreate");
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d("MyTag", "calendarFragment onCreateView");
 
         View root = inflater.inflate(R.layout.fragment_calendar, container, false);
 
         mLoadingDialog = new LoadingDialog(activity, R.style.Loading_Dialog_Theme);
-
-        TabLayout mTabLayout = root.findViewById(R.id.tabLayout);
 
         calendarView = root.findViewById(R.id.calendarView);
 
@@ -284,17 +290,21 @@ public class CalendarFragment extends Fragment implements Constant {
         scrollView.setFillViewport(true);
 
         mViewPager2 = root.findViewById(R.id.viewPager);
+        mViewPager2.setOffscreenPageLimit(2);
 
-        mFragmentAdapter = new ViewPagerFragmentAdapter(getChildFragmentManager(), getLifecycle());
+        mFragmentAdapter = new ViewPagerFragmentAdapter(getChildFragmentManager(), getLifecycle(), new FragmentDiffUtil());
 
         mViewPager2.setAdapter(mFragmentAdapter);
-        mViewPager2.registerOnPageChangeCallback(new OnPageChangeCallback() {
+        /*mViewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
-             // super.onPageSelected(position);
-                new PageChangeTask(CalendarFragment.this).execute();
+                super.onPageSelected(position);
+                mViewPager2.setCurrentItem(position);
+                //new PageChangeTask(CalendarFragment.this).execute();
             }
-        });
+        });*/
+
+        TabLayout mTabLayout = root.findViewById(R.id.tabLayout);
         new TabLayoutMediator(mTabLayout, mViewPager2, (tab, position) -> {
             switch (position) {
                 case 0 :
@@ -477,17 +487,56 @@ public class CalendarFragment extends Fragment implements Constant {
     }
 
     private void fragmentRefresh() {
-        mFragmentAdapter.clearFragment();
-        mFragmentAdapter.addFragment(new Calendar_AllFragment());
-        mFragmentAdapter.addFragment(new Calendar_IncomeFragment());
-        mFragmentAdapter.addFragment(new Calendar_ExpenFragment());
-        mFragmentAdapter.notifyDataSetChanged();
+        mFragmentAdapter.submitList(new ArrayList<Fragment>() {
+            {
+                add(new Calendar_AllFragment());
+                add(new Calendar_IncomeFragment());
+                add(new Calendar_ExpenFragment());
+            }
+        });
+    }
+
+    @Override
+    public void onStart() {
+        Log.d("MyTag", "CalendarFragment onStart");
+        super.onStart();
     }
 
     @Override
     public void onResume() {
+        Log.d("MyTag", "CalendarFragment onResume");
         super.onResume();
         calendarView.setCurrentDate(CalendarDay.from(StaticVariable.year, StaticVariable.month, StaticVariable.day), false);
         new DecorateTask(CalendarFragment.this).execute();
+    }
+
+    @Override
+    public void onPause() {
+        Log.d("MyTag", "CalendarFragment onPause");
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        Log.d("MyTag", "CalendarFragment onStop");
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        Log.d("MyTag", "CalendarFragment onDestroyView");
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d("MyTag", "CalendarFragment onDestroy");
+        super.onDestroy();
+    }
+
+    @Override
+    public void onDetach() {
+        Log.d("MyTag", "CalendarFragment onDetach");
+        super.onDetach();
     }
 }

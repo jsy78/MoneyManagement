@@ -2,9 +2,14 @@ package com.knu.moneymanagement;
 
 import android.graphics.Bitmap;
 import android.icu.util.Calendar;
-import java.text.DecimalFormat;
+import android.text.TextUtils;
 
-public class RecyclerViewItem {
+import androidx.annotation.NonNull;
+
+import java.text.DecimalFormat;
+import java.util.Objects;
+
+public class RecyclerViewItem implements Cloneable {
 
     private boolean check;
     private int id;
@@ -141,4 +146,27 @@ public class RecyclerViewItem {
         this.check = check;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof RecyclerViewItem) {
+            RecyclerViewItem another = (RecyclerViewItem) obj;
+
+            return this.check == another.check &&
+                   TextUtils.equals(this.category, another.category) &&
+                   TextUtils.equals(this.dateStr, another.dateStr) &&
+                   TextUtils.equals(this.detailStr,another.detailStr) &&
+                   TextUtils.equals(this.moneyStr, another.moneyStr);
+        }
+        return false;
+    }
+
+    @NonNull
+    @Override
+    public RecyclerViewItem clone() {
+        try {
+            return (RecyclerViewItem) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
